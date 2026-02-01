@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IfThenElsewhere - Counterfactual Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .button-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .output-section {
+            margin-top: 30px;
+        }
+        
+        .output-label {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        #output {
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #666;
+            font-style: italic;
+        }
+        
+        #output.has-content {
+            background-color: white;
+            color: #333;
+            font-style: normal;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IfThenElsewhere</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Generate counterfactual scenarios and explore alternative possibilities
+        </p>
+        
+        <div class="input-section">
+            <label for="input-text">Enter your scenario or statement:</label>
+            <textarea 
+                id="input-text" 
+                placeholder="Type your scenario here... For example: 'If I had studied computer science instead of literature...'"
+            ></textarea>
+        </div>
+        
+        <div class="button-section">
+            <button id="generate-btn" onclick="generateCounterfactual()">
+                Generate Counterfactual
+            </button>
+        </div>
+        
+        <div class="output-section">
+            <div class="output-label">Generated Counterfactual:</div>
+            <div id="output">
+                Your counterfactual scenario will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateCounterfactual() {
+            const inputText = document.getElementById('input-text').value.trim();
+            const outputDiv = document.getElementById('output');
+            const button = document.getElementById('generate-btn');
+            
+            if (!inputText) {
+                alert('Please enter some text to generate a counterfactual scenario.');
+                return;
+            }
+            
+            // Show loading state
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            outputDiv.textContent = 'Processing your input...';
+            outputDiv.classList.remove('has-content');
+            
+            // Simulate processing (replace this with actual API call)
+            setTimeout(() => {
+                // This is where you would integrate with your counterfactual generation logic
+                const sampleOutput = `Counterfactual analysis of: "${inputText}"\n\nAlternative scenarios:\n• What if the opposite had occurred?\n• What if different conditions were present?\n• What if the timing had been different?\n\n[This is a placeholder - integrate with your actual counterfactual generation system]`;
+                
+                outputDiv.textContent = sampleOutput;
+                outputDiv.classList.add('has-content');
+                
+                // Reset button
+                button.textContent = 'Generate Counterfactual';
+                button.disabled = false;
+            }, 1500);
+        }
+        
+        // Allow Enter key to trigger generation (with Ctrl/Cmd)
+        document.getElementById('input-text').addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                generateCounterfactual();
+            }
+        });
+    </script>
+</body>
+</html>
