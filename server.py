@@ -51,30 +51,32 @@ def ask():
         # Simple counterfactual generation (replace with your logic)
         response = generate_counterfactual(input_text)
         
-        return jsonify({'response': response})
+        return jsonify(response)
     
     except Exception as e:
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 def generate_counterfactual(text):
-    """
-    Generate a counterfactual response based on input text.
-    Replace this with your actual counterfactual generation logic.
-    """
-    # Simple template-based response for demonstration
-    if "if" in text.lower():
-        return f"Considering your scenario: '{text}', here are some alternative possibilities:\n\n" \
-               f"• What if the opposite were true?\n" \
-               f"• How might things be different under other conditions?\n" \
-               f"• Consider the chain of events that would need to change.\n\n" \
-               f"This is a placeholder response. Implement your counterfactual logic here."
-    else:
-        return f"Based on '{text}', let me explore some counterfactual scenarios:\n\n" \
-               f"• If {text} had not happened, then...\n" \
-               f"• Imagine if the circumstances were different...\n" \
-               f"• In an alternative timeline where this wasn't the case...\n\n" \
-               f"This is a placeholder response. Implement your counterfactual logic here."
+    return {
+        "original": text,
+        "mutations": [
+            {
+                "dimension": "taxpayer status",
+                "counterfactual": "Assume taxpayer is foreign",
+                "impact": "Source and withholding rules apply"
+            },
+            {
+                "dimension": "entity classification",
+                "counterfactual": "What if the entity were a partnership instead of a corporation?",
+                "impact": "Subchapter K applies; pass-through taxation, allocation of income, and partner-level consequences become central."
+            },
+            {
+                "dimension": "timing",
+                "counterfactual": "Assume election is late",
+                "impact": "Election likely invalid absent 9100 relief"
+            }
+        ]
+    }
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+
+ 
