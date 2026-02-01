@@ -271,9 +271,10 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.response) {
-                    displayResponse(data.response);
-                } else {
+               if (response.ok && data.mutations) {
+    displayResponse(data);
+}
+ else {
                     showError(data.error || 'Failed to generate counterfactuals. Please try again.');
                 }
 
@@ -287,9 +288,20 @@
             }
         }
 
-        function displayResponse(response) {
-            output.innerHTML = response;
-        }
+        function displayResponse(data) {
+    output.innerHTML = "";
+
+    data.mutations.forEach(m => {
+        output.innerHTML += `
+            <div style="border:1px solid #ccc; padding:15px; margin:15px; border-radius:8px;">
+                <h3>${m.dimension}</h3>
+                <p><b>What if:</b> ${m.counterfactual}</p>
+                <p><b>Impact:</b> ${m.impact}</p>
+            </div>
+        `;
+    });
+}
+
 
         function showError(message) {
             output.innerHTML = `<div class="error">${message}</div>`;
