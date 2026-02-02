@@ -3,6 +3,7 @@ import os
 
 app = Flask(__name__)
 
+# Serve the HTML UI
 def get_html_content():
     with open('index.html', 'r', encoding='utf-8') as f:
         return f.read()
@@ -11,6 +12,7 @@ def get_html_content():
 def index():
     return render_template_string(get_html_content())
 
+# Main endpoint
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -25,23 +27,24 @@ def ask():
     result = generate_counterfactual_analysis(fact, analysis, mutation)
     return jsonify({'result': result})
 
+# Core logic (this is the ONLY function you ever replace with AI)
 def generate_counterfactual_analysis(fact, analysis, mutation):
-    """
-    This is the only function you will ever replace with AI.
-    """
-
     return f"""
-ORIGINAL FACT:
+ORIGINAL FACT
+-------------
 {fact}
 
-ORIGINAL ANALYSIS:
+ORIGINAL ANALYSIS
+-----------------
 {analysis}
 
-COUNTERFACTUAL ASSUMPTION:
+COUNTERFACTUAL ASSUMPTION
+-------------------------
 {mutation}
 
-REWRITTEN ANALYSIS:
-[This is where Open Arena rewrites the analysis under the new assumption.]
+REWRITTEN ANALYSIS
+------------------
+[This is where Open Arena will rewrite the analysis under the new assumption.]
 """
 
 if __name__ == '__main__':
