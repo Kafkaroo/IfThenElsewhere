@@ -1,4 +1,3 @@
-print("SERVER FILE EXECUTED")
 from flask import Flask, render_template_string, request, jsonify
 import os
 
@@ -79,5 +78,8 @@ def generate_counterfactual(text):
         ]
     }
 
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
 
  
