@@ -1,122 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IfThenElsewhere</title>
+<meta charset="UTF-8">
+<title>If Then Elsewhere</title>
 
-    <style>
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-            background: #ffffff;
-            color: #123015;
-            margin: 0;
-            padding: 40px;
-        }
+<style>
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #ffffff;
+    color: #123015;
+    margin: 0;
+    padding: 40px;
+}
 
-        .app {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+.app {
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-        h1 {
-            font-size: 32px;
-            margin-bottom: 8px;
-            color: #123015;
-        }
+h1 {
+    font-size: 32px;
+    margin-bottom: 6px;
+}
 
-        .subtitle {
-            color: #666;
-            margin-bottom: 32px;
-        }
+.subtitle {
+    color: #666;
+    margin-bottom: 32px;
+}
 
-        .block {
-            border: 2px solid #123015;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
+.block {
+    border: 2px solid #123015;
+    padding: 20px;
+    margin-bottom: 24px;
+}
 
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
 
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            font-size: 15px;
-            border: 2px solid #D64000;
-            font-family: inherit;
-            resize: vertical;
-        }
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    font-size: 15px;
+    border: 2px solid #D64000;
+    font-family: inherit;
+    resize: vertical;
+}
 
-        textarea:focus {
-            outline: none;
-            border-color: #123015;
-        }
+textarea:focus {
+    outline: none;
+    border-color: #123015;
+}
 
-        button {
-            background: #D64000;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+button {
+    background: #D64000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-        button:hover {
-            background: #b73700;
-        }
+button:hover {
+    background: #b73700;
+}
 
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+.output {
+    border: 2px solid #123015;
+    padding: 20px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
 
-        .output {
-            border: 2px solid #123015;
-            padding: 20px;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
+.loading {
+    color: #666;
+}
 
-        .mutation {
-            border-left: 6px solid #D64000;
-            padding-left: 14px;
-            margin-bottom: 18px;
-        }
-
-        .mutation h3 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-        }
-
-        .loading {
-            color: #666;
-        }
-
-        .error {
-            color: #D64000;
-            font-weight: 600;
-        }
-    </style>
+.error {
+    color: #D64000;
+    font-weight: 600;
+}
+</style>
 </head>
 
 <body>
-<div class="header">
-    <h1>If Then Elsewhere</h1>
-    <p>Turning over every rock — and documenting the hypothetical ecosystem beneath it.</p>
-</div>
+<div class="app">
 
-    <div class="block">
-        <label>Scenario / Statement</label>
-        <textarea id="inputText" placeholder="e.g. A U.S. corporation acquires a foreign target in a stock-for-stock reorganization."></textarea>
+    <h1>If Then Elsewhere</h1>
+    <div class="subtitle">
+        Turning over every rock — and documenting the hypothetical ecosystem beneath it.
     </div>
 
-    <button id="generateBtn">Generate Counterfactual</button>
+    <div class="block">
+        <label>Original Scenario</label>
+        <textarea id="fact" placeholder="e.g. A U.S. corporation acquires a foreign target in a stock-for-stock reorganization."></textarea>
+    </div>
+
+    <div class="block">
+        <label>Counterfactual Assumption</label>
+        <textarea id="mutation" placeholder="e.g. Assume the target is instead a partnership."></textarea>
+    </div>
+
+    <button id="generateBtn">Generate Analysis</button>
 
     <div style="height:30px;"></div>
 
@@ -127,52 +116,42 @@
 </div>
 
 <script>
-    const inputText = document.getElementById('inputText');
-    const generateBtn = document.getElementById('generateBtn');
-    const output = document.getElementById('output');
+const fact = document.getElementById('fact');
+const mutation = document.getElementById('mutation');
+const generateBtn = document.getElementById('generateBtn');
+const output = document.getElementById('output');
 
-    async function generateCounterfactual() {
-        const input = inputText.value.trim();
-        if (!input) return;
+async function generateAnalysis() {
+    if (!fact.value.trim() || !mutation.value.trim()) return;
 
-        generateBtn.disabled = true;
-        output.innerHTML = "<div class='loading'>Running analysis…</div>";
+    generateBtn.disabled = true;
+    output.innerHTML = "<div class='loading'>Running analysis…</div>";
 
-        try {
-            const response = await fetch('/ask', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ text: input })
-            });
-
-            const data = await response.json();
-
-            if (data.mutations) {
-                renderMutations(data.mutations);
-            } else {
-                output.innerHTML = "<div class='error'>No output.</div>";
-            }
-        } catch (e) {
-            output.innerHTML = "<div class='error'>Server not reachable.</div>";
-        }
-
-        generateBtn.disabled = false;
-    }
-
-    function renderMutations(mutations) {
-        output.innerHTML = "";
-        mutations.forEach(m => {
-            output.innerHTML += `
-                <div class="mutation">
-                    <h3>${m.dimension}</h3>
-                    <div><b>What if:</b> ${m.counterfactual}</div>
-                    <div><b>Impact:</b> ${m.impact}</div>
-                </div>
-            `;
+    try {
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fact: fact.value,
+                mutation: mutation.value
+            })
         });
+
+        const data = await response.json();
+
+        if (data.result) {
+            output.textContent = data.result;
+        } else {
+            output.innerHTML = "<div class='error'>No output.</div>";
+        }
+    } catch (e) {
+        output.innerHTML = "<div class='error'>Server not reachable.</div>";
     }
 
-    generateBtn.addEventListener('click', generateCounterfactual);
+    generateBtn.disabled = false;
+}
+
+generateBtn.addEventListener('click', generateAnalysis);
 </script>
 </body>
 </html>
