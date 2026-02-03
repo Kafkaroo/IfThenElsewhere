@@ -69,8 +69,8 @@ Task:
 2) Rewrite the analysis as if the counterfactual assumption were true.
 Return only the rewritten analysis.
 """
-python
-def generate_counterfactual_analysis(...):
+
+def generate_counterfactual_analysis(fact, analysis, mutation):
     ...
     key = os.environ.get("ANTHROPIC_API_KEY", "")
     print(f"Key present: {bool(key)}, length: {len(key)}")
