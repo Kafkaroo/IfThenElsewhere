@@ -1,4 +1,3 @@
-print("HIT generate_counterfactual_analysis")
 from flask import Flask, render_template_string, request, jsonify
 import os
 import anthropic
@@ -70,7 +69,11 @@ Rewrite the analysis as if the counterfactual assumption were true.
         ]
     )
 
-    return message.content[0].text
+    return "\n".join(
+    block.text for block in message.content
+    if getattr(block, "type", None) == "text"
+)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
