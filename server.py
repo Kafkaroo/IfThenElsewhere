@@ -34,9 +34,8 @@ def ask():
 
 # Core logic (now Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
-    message = client.messages.create(...)
-    print(message)
-    print(message.model_dump())
+    print("HIT")
+    return "TEST OK"
    
     system_prompt = """
 You are a senior legal analyst.
