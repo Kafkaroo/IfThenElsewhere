@@ -26,9 +26,6 @@ def ask():
     analysis = (data.get("analysis") or "").strip()
     mutation = (data.get("mutation") or "").strip()
 
-    # Frontend is currently not sending "analysis".
-    # Keep the contract stable by allowing analysis to be omitted; we will still
-    # generate a useful output by treating the "fact" field as the baseline narrative.
     if not fact or not mutation:
         return jsonify({
             "error": "Missing input. Required fields: fact, mutation. Optional: analysis.",
@@ -40,7 +37,8 @@ def ask():
 
 # Core logic (Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
         return "ERROR: ANTHROPIC_API_KEY is not set. Set it in PowerShell before running the server."
     
     system_prompt = (
@@ -70,8 +68,7 @@ Task:
 Return only the rewritten analysis.
 """
 
-def generate_counterfactual_analysis(fact, analysis, mutation):
-    ...
+    # Diagnostic output for API key sanity (truncated for safety)
     key = os.environ.get("ANTHROPIC_API_KEY", "")
     print(f"Key present: {bool(key)}, length: {len(key)}")
     print(f"Key prefix: {key[:5]!r}")
@@ -95,3 +92,4 @@ def generate_counterfactual_analysis(fact, analysis, mutation):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
+```
