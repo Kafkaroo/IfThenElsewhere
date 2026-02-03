@@ -21,7 +21,9 @@ def index():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
+    print("RAW JSON:", data)
 
+    
     fact = data.get('fact', '').strip()
     analysis = data.get('analysis', '').strip()
     mutation = data.get('mutation', '').strip()
