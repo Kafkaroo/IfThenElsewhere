@@ -76,7 +76,6 @@ def generate_counterfactual_analysis(...):
     print(f"Key present: {bool(key)}, length: {len(key)}")
     print(f"Key prefix: {key[:5]!r}")
 
-    message = client.messages.create(...)
     message = client.messages.create(
         model="claude-3-5-sonnet-20240620",
         max_tokens=3000,
