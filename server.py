@@ -1,3 +1,7 @@
+message = client.messages.create(...)
+print(message)
+print(message.model_dump())
+
 from flask import Flask, render_template_string, request, jsonify
 import os
 import anthropic
