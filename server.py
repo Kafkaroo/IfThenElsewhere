@@ -20,19 +20,22 @@ def index():
 # Main endpoint
 @app.route('/ask', methods=['POST'])
 def ask():
-    data = request.get_json()
+    print("Content-Type:", request.content_type)
+    print("Raw body:", request.get_data(as_text=True))
+
+    data = request.get_json(silent=True)
     print("RAW JSON:", data)
 
-    
-    fact = data.get('fact', '').strip()
-    analysis = data.get('analysis', '').strip()
-    mutation = data.get('mutation', '').strip()
+    fact = (data or {}).get('fact', '').strip()
+    analysis = (data or {}).get('analysis', '').strip()
+    mutation = (data or {}).get('mutation', '').strip()
 
     if not fact or not analysis or not mutation:
-        return jsonify({'error': 'Missing input'}), 400
+        return jsonify({'error': 'Missing input', 'received': data}), 400
 
     result = generate_counterfactual_analysis(fact, analysis, mutation)
     return jsonify({'result': result})
+
 
 # Core logic (now Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
