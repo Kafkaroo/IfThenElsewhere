@@ -40,6 +40,9 @@ def ask():
 
 # Core logic (Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return "ERROR: ANTHROPIC_API_KEY is not set. Set it in PowerShell before running the server."
+    
     system_prompt = (
         "You are a senior U.S. federal tax legal analyst.\n"
         "Rewrite the analysis under a counterfactual assumption.\n"
