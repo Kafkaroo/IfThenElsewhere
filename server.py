@@ -10,60 +10,61 @@ client = anthropic.Anthropic(
 
 # Serve the HTML UI
 def get_html_content():
-    with open('index.html', 'r', encoding='utf-8') as f:
+    with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
-@app.route('/')
+@app.route("/")
 def index():
     return render_template_string(get_html_content())
 
 # Main endpoint
-@app.route('/ask', methods=['POST'])
+@app.route("/ask", methods=["POST"])
 def ask():
-    print("Content-Type:", request.content_type)
-    print("Raw body:", request.get_data(as_text=True))
+    data = request.get_json(silent=True) or {}
 
-    data = request.get_json(silent=True)
-    print("RAW JSON:", data)
+    fact = (data.get("fact") or "").strip()
+    analysis = (data.get("analysis") or "").strip()
+    mutation = (data.get("mutation") or "").strip()
 
-    fact = (data or {}).get('fact', '').strip()
-    analysis = (data or {}).get('analysis', '').strip()
-    mutation = (data or {}).get('mutation', '').strip()
-
-    if not fact or not analysis or not mutation:
-        return jsonify({'error': 'Missing input', 'received': data}), 400
+    # Frontend is currently not sending "analysis".
+    # Keep the contract stable by allowing analysis to be omitted; we will still
+    # generate a useful output by treating the "fact" field as the baseline narrative.
+    if not fact or not mutation:
+        return jsonify({
+            "error": "Missing input. Required fields: fact, mutation. Optional: analysis.",
+            "received_keys": list(data.keys())
+        }), 400
 
     result = generate_counterfactual_analysis(fact, analysis, mutation)
-    return jsonify({'result': result})
+    return jsonify({"result": result})
 
-
-# Core logic (now Claude-powered)
+# Core logic (Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
-    print("HIT")
-    return "TEST OK"
-   
-    system_prompt = """
-You are a senior legal analyst.
-Your task is to rewrite the legal analysis under a counterfactual assumption.
-Do not summarize. Do not explain methodology.
-Produce only the rewritten analysis.
-Maintain professional legal tone and structure.
-"""
+    system_prompt = (
+        "You are a senior U.S. federal tax legal analyst.\n"
+        "Rewrite the analysis under a counterfactual assumption.\n"
+        "Do not summarize. Do not explain methodology.\n"
+        "Produce only the rewritten analysis, in a professional legal tone.\n"
+        "If the provided baseline analysis is empty or inadequate, infer a reasonable baseline analysis "
+        "from the facts before rewriting under the counterfactual."
+    )
 
-    user_prompt = f"""
-ORIGINAL FACT
+    user_prompt = f"""ORIGINAL FACT
 -------------
 {fact}
 
 ORIGINAL ANALYSIS
 -----------------
-{analysis}
+{analysis if analysis else "[No baseline analysis provided. Infer a baseline analysis from the facts.]"} 
 
 COUNTERFACTUAL ASSUMPTION
 -------------------------
 {mutation}
 
-Rewrite the analysis as if the counterfactual assumption were true.
+Task:
+1) If needed, infer the baseline analysis from the facts.
+2) Rewrite the analysis as if the counterfactual assumption were true.
+Return only the rewritten analysis.
 """
 
     message = client.messages.create(
@@ -76,12 +77,12 @@ Rewrite the analysis as if the counterfactual assumption were true.
         ]
     )
 
+    # Robust extraction across SDK response shapes
     return "\n".join(
-    block.text for block in message.content
-    if getattr(block, "type", None) == "text"
-)
+        block.text for block in getattr(message, "content", [])
+        if getattr(block, "type", None) == "text" and getattr(block, "text", None)
+    ).strip()
 
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
