@@ -1,7 +1,12 @@
 from flask import Flask, render_template_string, request, jsonify
 import os
+import anthropic
 
 app = Flask(__name__)
+
+client = anthropic.Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY")
+)
 
 # Serve the HTML UI
 def get_html_content():
@@ -27,9 +32,18 @@ def ask():
     result = generate_counterfactual_analysis(fact, analysis, mutation)
     return jsonify({'result': result})
 
-# Core logic (this is the ONLY function you ever replace with AI)
+# Core logic (now Claude-powered)
 def generate_counterfactual_analysis(fact, analysis, mutation):
-    return f"""
+
+    system_prompt = """
+You are a senior legal analyst.
+Your task is to rewrite the legal analysis under a counterfactual assumption.
+Do not summarize. Do not explain methodology.
+Produce only the rewritten analysis.
+Maintain professional legal tone and structure.
+"""
+
+    user_prompt = f"""
 ORIGINAL FACT
 -------------
 {fact}
@@ -42,10 +56,20 @@ COUNTERFACTUAL ASSUMPTION
 -------------------------
 {mutation}
 
-REWRITTEN ANALYSIS
-------------------
-[This is where Open Arena will rewrite the analysis under the new assumption.]
+Rewrite the analysis as if the counterfactual assumption were true.
 """
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20240620",
+        max_tokens=3000,
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    )
+
+    return message.content[0].text
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
